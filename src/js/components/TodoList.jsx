@@ -20,21 +20,26 @@ const TodoList = () => {
 
     // Agregar tarea
     function agregarTarea(idTodo) {
-
-        const nuevaTarea = { label: nuevaTarea, done: false };
-
-        fetch("https://playground.4geeks.com/todo/todos/", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(nuevaTarea),
-        })
-            .then((response) => response.json())
-            .then(() => {
-                setNuevaTarea("");
-                leerTareas(); // Recargar la lista después de agregar
+            const requestOptions = {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    "label": nuevaTarea,
+                    "is_done": false
+                  })
+            };
+            fetch('https://playground.4geeks.com/todo/todos/Yenimar', requestOptions)
+            .then(response => {
+                if (!response.ok) throw new Error(`Error al agregar tarea: ${response.status}`);
+                return response.json();
             })
+            .then(data => {
+                console.log("Tarea agregada:", data);
+                setNuevaTarea(""); // Limpiar el input después de agregar la tarea
+                leerTareas(); // Actualizar la lista automáticamente
+            })
+            .catch(error => console.error("Error al agregar tarea:", error));
     }
-
     // Eliminar tarea
     function eliminarTarea(idtodo) {
         fetch(`https://playground.4geeks.com/todo/todos/${idtodo}`, {
@@ -49,7 +54,6 @@ const TodoList = () => {
             })
             .catch((error) => console.error("Error en la eliminación:", error));
     }
-
     // Cargar tareas al inicio
     useEffect(() => {
         leerTareas();
@@ -64,7 +68,9 @@ const TodoList = () => {
                 onChange={(e) => setNuevaTarea(e.target.value)}
                 placeholder="Escribe la nueva tarea"
             />
-            <button onClick={agregarTarea}>Agregar Tarea</button>
+            <button onClick={agregarTarea}>Agregar Tarea
+            
+            </button>
             <button onClick={leerTareas}>Leer Lista de Tareas</button>
 
             {tareas.length > 0 ? (
